@@ -37,7 +37,7 @@ def main():
     elif args.model == 'swinir':
         model = SwinIRLightning(args.mode, args.lr, args.epochs)
 
-    trainer = Trainer(accelerator='gpu', max_epochs=args.epochs, logger=logger, callbacks=callbacks, precision='16-mixed', accumulate_grad_batches=32)
+    trainer = Trainer(accelerator='gpu', max_epochs=args.epochs, logger=logger, callbacks=callbacks, precision='32', accumulate_grad_batches=32)
     trainer.fit(model, train_loader, val_loader)
     trainer.test(model, dataloaders=(test_loader))
 
