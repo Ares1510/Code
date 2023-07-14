@@ -18,7 +18,7 @@ class SwinIRLightning(pl.LightningModule):
         self.mode = mode
         self.lr = lr
         self.epochs = epochs
-        self.model = SwinIR(img_size=512, patch_size=64, window_size=64, in_chans=1, embed_dim=64, depths=[4], num_heads=[2], mlp_ratio=2, qkv_bias=False, upsampler=None, upscale=1)
+        self.model = SwinIR(img_size=256, patch_size=64, window_size=64, in_chans=1, embed_dim=64, depths=[4], num_heads=[2], mlp_ratio=2, qkv_bias=False, upsampler=None, upscale=1)
         self.criterion = nn.L1Loss()
 
         metrics = MetricCollection([StructuralSimilarityIndexMeasure(), PeakSignalNoiseRatio()])
@@ -57,7 +57,7 @@ class SwinIRLightning(pl.LightningModule):
         self.test_metrics(y_hat, gt, on_step=False, on_epoch=True)
         self.log_dict(self.test_metrics, on_step=False, on_epoch=True, logger=True)
         #log only one image from the test set
-        if batch_idx == 0:
+        if batch_idx in [10, 75, 150, 200]:
             self.logger.log_image(key='noisy image', images=[to_image(x)])
             self.logger.log_image(key='denoised image', images=[to_image(y_hat)])
             self.logger.log_image(key='ground truth', images=[to_image(gt)])

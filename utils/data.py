@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 import torch.nn.functional as F
 from pydicom import dcmread
+from skimage.transform import resize
 from torch.utils.data import Dataset, DataLoader
 
 
@@ -15,7 +16,6 @@ def read_file(path):
             line = line.split()
             data.append(line)
     return data
-
 
 def read_dicom(path):
     with open(path, 'rb') as f:
@@ -52,20 +52,11 @@ class MayoDataset(Dataset):
     def __init__(self, split, neighbor=2, ks=7, th=30):
         self.data = read_file(f'datasets/mayo/mayo_{split}.txt')
         self.hu_range = [-160, 240]
-        self.crop_size = 512
         self.split = split
         self.neighbor = neighbor
         self.ks = ks
         self.th = th
         self.kernel = torch.ones(1, 1, ks, ks).to(torch.float32)
-
-    def random_crop_img2(self, img_list):
-        y = np.random.randint(img_list[0].shape[0] - self.crop_size + 1)
-        x = np.random.randint(img_list[0].shape[1] - self.crop_size + 1)
-        img_out = []
-        for img in img_list:
-            img_out.append(img[y: y + self.crop_size, x: x + self.crop_size, ...])
-        return img_out
 
     def __len__(self):
         return len(self.data)
@@ -102,6 +93,10 @@ class MayoDataset(Dataset):
         ndct_image = ndct_image.astype(np.float32)
         sim_image = sim_image.astype(np.float32)
 
+        # ldct_image = resize(ldct_image, (256, 256), anti_aliasing=True, preserve_range=True, clip=False)
+        # ndct_image = resize(ndct_image, (256, 256), anti_aliasing=True, preserve_range=True, clip=False)
+        # sim_image = resize(sim_image, (256, 256), anti_aliasing=True, preserve_range=True, clip=False)
+
         ldct_image = np.clip(ldct_image - 1024, self.hu_range[0], self.hu_range[1])
         ndct_image = np.clip(ndct_image - 1024, self.hu_range[0], self.hu_range[1])
         sim_image = np.clip(sim_image - 1024, self.hu_range[0], self.hu_range[1])
@@ -126,8 +121,6 @@ class MayoDataset(Dataset):
         img_ignore = (img_ignore - self.hu_range[0]) / (self.hu_range[1] - self.hu_range[0])
 
         if self.split == 'train':
-            ldct_image, sim_image, img_ignore, ndct_image = self.random_crop_img2([ldct_image, sim_image, img_ignore, ndct_image])
-
             random_mode = np.random.randint(0, 8)
             ldct_image = random_rotate_mirror(ldct_image.squeeze(), random_mode)
             sim_image = random_rotate_mirror(sim_image.squeeze(), random_mode)
@@ -167,10 +160,10 @@ class MayoLoader():
         self.test_set = MayoDataset('test')
 
     def train(self):
-        return DataLoader(self.train_set, batch_size=self.batch_size, shuffle=True, num_workers=4, pin_memory=True)
+        return DataLoader(self.train_set, batch_size=self.batch_size, shuffle=True, num_workers=8, pin_memory=True)
     
     def val(self):
-        return DataLoader(self.val_set, batch_size=self.batch_size, shuffle=False, num_workers=4, pin_memory=True)
+        return DataLoader(self.val_set, batch_size=self.batch_size, shuffle=False, num_workers=8, pin_memory=True)
     
     def test(self):
-        return DataLoader(self.test_set, batch_size=1, shuffle=False, num_workers=4, pin_memory=True)
+        return DataLoader(self.test_set, batch_size=1, shuffle=False, num_workers=8, pin_memory=True)
