@@ -4,7 +4,6 @@ import cv2
 import numpy as np
 import torch.nn.functional as F
 from pydicom import dcmread
-from skimage.transform import resize
 from torch.utils.data import Dataset, DataLoader
 
 
@@ -23,6 +22,7 @@ def read_dicom(path):
     image = ds.pixel_array
     return image
 
+# from noise2sim repository
 def random_rotate_mirror(img_0, random_mode):
     if random_mode == 0:
         img = img_0
@@ -47,7 +47,7 @@ def random_rotate_mirror(img_0, random_mode):
         raise TypeError
     return img
 
-
+# adapted from noise2sim repository
 class MayoDataset(Dataset):
     def __init__(self, split, neighbor=2, ks=7, th=30):
         self.data = read_file(f'datasets/mayo/mayo_{split}.txt')
@@ -92,10 +92,6 @@ class MayoDataset(Dataset):
         ldct_image = ldct_image.astype(np.float32)
         ndct_image = ndct_image.astype(np.float32)
         sim_image = sim_image.astype(np.float32)
-
-        # ldct_image = resize(ldct_image, (256, 256), anti_aliasing=True, preserve_range=True, clip=False)
-        # ndct_image = resize(ndct_image, (256, 256), anti_aliasing=True, preserve_range=True, clip=False)
-        # sim_image = resize(sim_image, (256, 256), anti_aliasing=True, preserve_range=True, clip=False)
 
         ldct_image = np.clip(ldct_image - 1024, self.hu_range[0], self.hu_range[1])
         ndct_image = np.clip(ndct_image - 1024, self.hu_range[0], self.hu_range[1])

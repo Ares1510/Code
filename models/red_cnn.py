@@ -4,7 +4,7 @@ from torch import nn, optim
 from torchmetrics import StructuralSimilarityIndexMeasure, PeakSignalNoiseRatio, MetricCollection
 from models.scheduler import RampedLR
 
-
+# REDCNN model from https://github.com/SSinyu/RED-CNN
 class REDCNN(nn.Module):
     def __init__(self, out_ch=96):
         super(REDCNN, self).__init__()
@@ -44,14 +44,14 @@ class REDCNN(nn.Module):
         out = self.relu(out)
         return out
     
-
+# get image from tensor
 def to_image( x):
     x = x[0].permute(1, 2, 0)
     x = x.cpu().squeeze().numpy()
     x = np.clip(x, 0, 1) * 255
     return x
 
-
+# Pytorch Lightning module
 class RedCNNLightning(pl.LightningModule):
     def __init__(self, mode='n2c', lr=1e-4, epochs=10):
         super().__init__()

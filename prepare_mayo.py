@@ -1,3 +1,5 @@
+# adapted from noise2sim repository
+
 import os
 import argparse
 
@@ -8,7 +10,6 @@ def main():
     
     if args.mode == 'train':
         pid = ['L067', 'L096', 'L109', 'L143', 'L192', 'L286', 'L291', 'L310']
-        # pid = ['L067', 'L096', 'L109']
     elif args.mode == 'val':
         pid = ['L506']
     elif args.mode == 'test':
