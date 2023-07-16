@@ -1,4 +1,9 @@
-datasets/
-wandb/
-KF7029/
-datasets.zip
+Denoiser/datasets/
+Denoiser/wandb/
+Denoiser/MayoDenoiser/
+Denoiser/datasets.zip
+Denoiser/test.ipynb
+Classifier/data/
+Classifier/wandb/
+Classifier/test.ipynb
+Classifier/patches.ipynb
