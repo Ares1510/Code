@@ -21,7 +21,7 @@ class SwinIRLightning(pl.LightningModule):
         self.lr = lr
         self.epochs = epochs
         self.model = SwinIR(img_size=512, patch_size=64, window_size=64, in_chans=1, embed_dim=64, 
-                            depths=[4], num_heads=[2], mlp_ratio=2, qkv_bias=False, upsampler=None, upscale=1)
+                            depths=[4], num_heads=[4], mlp_ratio=2, qkv_bias=False, upsampler=None, upscale=1)
         self.criterion = nn.L1Loss()
 
         metrics = MetricCollection([StructuralSimilarityIndexMeasure(), PeakSignalNoiseRatio()])
