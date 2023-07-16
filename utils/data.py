@@ -156,10 +156,10 @@ class MayoLoader():
         self.test_set = MayoDataset('test')
 
     def train(self):
-        return DataLoader(self.train_set, batch_size=self.batch_size, shuffle=True, num_workers=8, pin_memory=True)
+        return DataLoader(self.train_set, batch_size=self.batch_size, shuffle=True, num_workers=2, pin_memory=True)
     
     def val(self):
-        return DataLoader(self.val_set, batch_size=self.batch_size, shuffle=False, num_workers=8, pin_memory=True)
+        return DataLoader(self.val_set, batch_size=self.batch_size, shuffle=False, num_workers=2, pin_memory=True)
     
     def test(self):
-        return DataLoader(self.test_set, batch_size=1, shuffle=False, num_workers=8, pin_memory=True)
+        return DataLoader(self.test_set, batch_size=1, shuffle=False, num_workers=2, pin_memory=True)
