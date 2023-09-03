@@ -1,3 +1,4 @@
+import glob
 import numpy as np
 import pandas as pd
 import SimpleITK as sitk
@@ -18,7 +19,7 @@ def get_patches(pid):
     series_reader.SetFileNames(series_reader.GetGDCMSeriesFileNames(f'data/LIDC-IDRI-{pid}/', series_ids[0]))
     dicom_series = series_reader.Execute()
 
-    df = pd.read_csv('data/candidates_V2_8.csv')
+    df = pd.read_csv('data/candidates_V2.csv')
     df = df[df['seriesuid'] == series_id]
 
     label = df['class'].values
@@ -29,7 +30,8 @@ def get_patches(pid):
     pixel_coords = (np.round(np.absolute(world_coords - origin) / dicom_series.GetSpacing())).astype(int)
 
     patches = []
-    for can in range(num_can):
+    labels = []
+    for can, lab in zip(range(num_can), label):
         voxel_cord = pixel_coords[can,:]
         x_pos = int(voxel_cord[0])
         y_pos = int(voxel_cord[1])
@@ -43,18 +45,22 @@ def get_patches(pid):
         y_upper = np.min([y_pos + patch_size, dicom_series.GetHeight()])
          
         patch = img_arr[z_pos, y_lower:y_upper, x_lower:x_upper]
-        # patch = normalize(patch)
-        patches.append(patch)
-    return np.asarray(patches), np.asarray(label)
+        patch = normalize(patch)
+        if patch.shape == (50, 50):
+            patches.append(patch)
+            labels.append(lab)
+    return np.asarray(patches), np.asarray(labels)
 
 def get_all_patches():
-    pid = ['0385', '0406', '0614', '0677', '0698', '0819', '0939', '1004']
+    files = glob.glob('data/LIDC-IDRI-*')
+    pid = [f.split('-')[-1] for f in files]
     patches = []
     labels = []
     for p in pid:
         patch, label = get_patches(p)
-        patches.append(patch)
-        labels.append(label)
+        if len(patch.shape) == 3:
+            patches.append(patch)
+            labels.append(label)
     patches = np.concatenate(patches, axis=0)
     labels = np.concatenate(labels, axis=0)
     return patches, labels
@@ -64,7 +70,8 @@ if __name__ == '__main__':
     patches, labels = get_all_patches()
     pos_idx = np.where(labels == 1)[0]
     neg_idx = np.where(labels == 0)[0]
-    neg_idx = np.random.choice(neg_idx, size=(pos_idx.shape[0] * 10), replace=False)
+    neg_idx = np.random.choice(neg_idx, size=(pos_idx.shape[0] * 5), replace=False)
+    
     idx = np.concatenate([pos_idx, neg_idx], axis=0)
     patches = patches[idx]
     labels = labels[idx]

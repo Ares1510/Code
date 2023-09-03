@@ -29,7 +29,6 @@ class CNNLightning(pl.LightningModule):
         self.model = CNN()
         self.class_weights = torch.tensor(class_weights, dtype=torch.float32)
         self.loss = nn.CrossEntropyLoss(weight=self.class_weights)
-        
 
         metrics = MetricCollection([Accuracy(task='binary'), Precision(task='binary'),
                                     Recall(task='binary'), F1Score(task='binary'), AUROC(task='binary')])
