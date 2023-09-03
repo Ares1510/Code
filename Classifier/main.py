@@ -53,7 +53,7 @@ def main():
     else:
         run_name = f'{time.strftime("%Y%m%d-%H%M%S")}'
 
-    logger = WandbLogger(name=run_name, project='LIDC', log_model='all')
+    logger = WandbLogger(name=run_name, project='Luna16', log_model='all')
     
     model = CNNLightning(lr=args.lr, class_weights=class_weights)
 
