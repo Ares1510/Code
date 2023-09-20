@@ -3,6 +3,8 @@
 # Originally Written by Ze Liu, Modified by Jingyun Liang.
 # -----------------------------------------------------------------------------------
 
+# full SwinIR model from https://github.com/JingyunLiang/SwinIR 
+
 import math
 import torch
 import torch.nn as nn
